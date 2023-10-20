@@ -6,8 +6,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware..
-app.use(cors());
+
+
+
 app.use(express.json());
+app.use(cors());
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.pywpewq.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -20,20 +24,46 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
+const dbConnect = async () => {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+      await client.connect()
+      console.log('Database Connected!')
+  } catch (error) {
+      console.log(error.name, error.message)
   }
 }
-run().catch(console.dir);
+dbConnect()
+
+    const brandCollection = client.db('brandDB').collection('brand');
+    const userCollection = client.db('brandDB').collection('user');
+
+// Use to product add..
+    app.post('/product', async(req, res)=>{
+        const newProduct = req.body;
+        const result = await brandCollection.insertOne(newProduct);
+        res.send(result);
+    })
+    
+    app.get('/product', async(req, res)=>{
+      const cursor = brandCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+
+    
+
+    // user related apis
+
+    app.post('/user', async(req, res) =>{
+      const user = req.body;
+      console.log(user);
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+
+    })
+
+  
 
 
 app.get('/', (req, res)=>{
