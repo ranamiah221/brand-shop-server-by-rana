@@ -32,6 +32,7 @@ const dbConnect = async () => {
 dbConnect()
 
     const brandCollection = client.db('brandDB').collection('brand');
+    const myCartCollection = client.db('brandDB').collection('myCart');
     const userCollection = client.db('brandDB').collection('user');
 
 // Use to product add..
@@ -40,9 +41,22 @@ dbConnect()
         const result = await brandCollection.insertOne(newProduct);
         res.send(result);
     })
+    // myCart add..
+    app.post('/myCart', async (req, res)=>{
+      const product = req.body;
+      const result = await myCartCollection.insertOne(product);
+      res.send(result);
+    })
+
+  
     //read product 
     app.get('/product', async(req, res)=>{
       const cursor = brandCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+    app.get('/myCart', async (req, res)=>{
+      const cursor = myCartCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
@@ -71,6 +85,7 @@ dbConnect()
       result= await brandCollection.findOne(query);
       res.send(result);
     })
+    
 
     app.delete('/product/:id', async(req, res)=>{
       const id = req.params.id;
