@@ -46,6 +46,31 @@ dbConnect()
       const result = await cursor.toArray();
       res.send(result);
     })
+    app.put('/product/:id',async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : new ObjectId(id)}
+      const options = {upsert : true}
+      const updatedProduct = req.body;
+      const product = {
+        $set: {
+          name : updatedProduct.name, 
+          image : updatedProduct.image,
+          brandName : updatedProduct.brandName, 
+          shortDescription : updatedProduct.shortDescription, 
+          type : updatedProduct.type, 
+          price : updatedProduct.price,
+        }
+      }
+      const result = await brandCollection.updateOne(filter, product, options)
+      res.send(result);
+    })
+
+    app.get('/product/:id',async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+      result= await brandCollection.findOne(query);
+      res.send(result);
+    })
 
     app.delete('/product/:id', async(req, res)=>{
       const id = req.params.id;
